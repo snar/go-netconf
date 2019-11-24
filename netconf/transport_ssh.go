@@ -159,6 +159,47 @@ func SSHConfigPassword(user string, pass string) *ssh.ClientConfig {
 	}
 }
 
+// SSHConfigKeyboardInteractive is a convenience function that takes a username and password
+// and returns a new ssh.ClientConfig setup to pass that username and password.
+// Convenience means that HostKey checks are disabled so it's probably less secure
+func SSHConfigKeyboardInteractive(user string, pass string) *ssh.ClientConfig {
+	return &ssh.ClientConfig{
+		User: user,
+		Auth: []ssh.AuthMethod{
+			ssh.KeyboardInteractive(func(user, instruction string,
+				questions []string, echos []bool) (answers []string, err error) {
+				answers = make([]string, len(questions))
+				for n, _ := range(questions) {
+					answers[n] = pass
+				}
+				return answers, nil;
+			}),
+		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}
+}
+
+// SSHConfigKeyboardInteractiveOrPassword is a convenience function that takes a username and password
+// and returns a new ssh.ClientConfig setup to pass that username and password.
+// Convenience means that HostKey checks are disabled so it's probably less secure
+func SSHConfigKeyboardInteractiveOrPassword(user string, pass string) *ssh.ClientConfig {
+	return &ssh.ClientConfig{
+		User: user,
+		Auth: []ssh.AuthMethod{
+			ssh.KeyboardInteractive(func(user, instruction string,
+				questions []string, echos []bool) (answers []string, err error) {
+				answers = make([]string, len(questions))
+				for n, _ := range(questions) {
+					answers[n] = pass
+				}
+				return answers, nil;
+			}),
+			ssh.Password(pass),
+		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	}
+}
+
 // SSHConfigPubKeyFile is a convenience function that takes a username, private key
 // and passphrase and returns a new ssh.ClientConfig setup to pass credentials
 // to DialSSH
