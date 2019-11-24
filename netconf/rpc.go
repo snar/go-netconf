@@ -12,6 +12,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"strings"
 )
 
 // RPCMessage represents an RPC Message to be sent.
@@ -99,7 +100,8 @@ type RPCError struct {
 
 // Error generates a string representation of the provided RPC error
 func (re *RPCError) Error() string {
-	return fmt.Sprintf("netconf rpc [%s] '%s'", re.Severity, re.Message)
+	return fmt.Sprintf("netconf rpc [%s] '%s'", re.Severity,
+		strings.TrimSpace(re.Message))
 }
 
 // RPCMethod defines the interface for creating an RPC method.
